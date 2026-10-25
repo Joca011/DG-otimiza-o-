@@ -324,6 +324,8 @@ img{display:block;max-width:100%}
 .wa-fab:hover{background:#18964A;transform:translateY(-2px)}
 .wa-fab svg{width:24px;height:24px;fill:#fff;flex:none}
 @media (max-width:560px){.wa-fab span{display:none}.wa-fab{width:52px;height:52px;padding:0;justify-content:center;border-radius:50%}}
+.paykeys{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;padding:0 22px}
+@media (max-width:560px){.paykeys{grid-template-columns:1fr}}
 /* compra realizada */
 .done{max-width:760px;margin-bottom:40px}
 .done .hd{display:flex;align-items:center;gap:14px;padding:22px;border-bottom:1px solid var(--line-hi)}
@@ -605,7 +607,7 @@ main.vin{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
       <div class="wrap">
         <div class="trust">
           <div><span class="ico" data-ico="bolt"></span><h4>Entrega pelo Discord</h4><p>Pagou, abriu o ticket com o comprovante e recebe por lá.</p></div>
-          <div><span class="ico" data-ico="pix"></span><h4>Pagamento via Pix</h4><p>Sem cartão e sem cadastro longo. Copie o código e pague no app do banco.</p></div>
+          <div><span class="ico" data-ico="pix"></span><h4>Pagamento via Pix</h4><p>Sem cartão e sem cadastro longo. Copie a chave e pague no app do banco.</p></div>
           <div><span class="ico" data-ico="headset"></span><h4>Suporte humano</h4><p>Antes ou depois da compra, você fala com uma pessoa de verdade.</p></div>
           <div><span class="ico" data-ico="lock"></span><h4>Poucos dados</h4><p>Login pelo Discord, nome e e-mail. Nada além disso.</p></div>
         </div>
@@ -617,7 +619,7 @@ main.vin{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
         <div class="sec-head"><div><span class="eyebrow">Passo a passo</span><h2>Como funciona</h2></div></div>
         <div class="steps">
           <div class="step"><span class="n">PASSO 1</span><h4>Escolha o plano</h4><p>Painel, otimização manual ou um dos combos. Veja o que vem em cada um antes de comprar.</p></div>
-          <div class="step"><span class="n">PASSO 2</span><h4>Pague via Pix</h4><p>Entre com o Discord, aplique o cupom e copie o código Pix para pagar no app do banco.</p></div>
+          <div class="step"><span class="n">PASSO 2</span><h4>Pague via Pix</h4><p>Entre com o Discord, aplique o cupom, copie a chave Pix e pague o valor do pedido no app do banco.</p></div>
           <div class="step"><span class="n">PASSO 3</span><h4>Receba e aplique</h4><p>Abra um ticket no Discord com o print do comprovante e o ID do pedido. A entrega é feita por lá.</p></div>
         </div>
       </div>
@@ -675,7 +677,7 @@ var CONFIG = {
   pixMinutes: 15,                        /* validade do Pix na tela de pagamento */
 
   /* Pix do recebedor. name: até 25 letras, sem acento. city: até 15 letras, sem acento. */
-  pix: { keyB64: 'KzU1NTU4NjI2MjY4MTY=',   /* celular +55 (55) 86262-6816 */ name: 'DG TWEAKS', city: 'SAO PAULO' },
+  pix: { keyB64: 'NTU4NjI2MjY4MTY=',   /* chave Pix: CPF 558.626.268-16 (em base64 só para não ficar legível no código) */ name: 'DG TWEAKS', city: 'SAO PAULO' },
 
   discord: {
     invite: 'https://discord.gg/DKZd5DJpc',        /* convite do servidor, ex.: https://discord.gg/xxxx (botão "Abrir ticket") */
@@ -729,7 +731,7 @@ var NEEDS = [
 var FAQ = [
   ['Como falo com a DG Tweaks?','Pelo Discord (ícone de fone no topo do site) ou pelo WhatsApp (14) 99118-6697, no botão verde no canto da tela.'],
   ['Como recebo meu pedido?','Depois de pagar, aparece o ID do pedido. Abra um ticket no nosso Discord, mande o print do comprovante e o ID, e a equipe entrega por lá. O resumo da compra também chega no seu privado do Discord.'],
-  ['Quais formas de pagamento existem?','Apenas Pix. No final da compra você copia o código Pix, que já vem com o valor, e cola no app do seu banco em Pix Copia e Cola.'],
+  ['Quais formas de pagamento existem?','Apenas Pix. No final da compra você copia a chave Pix, cola no app do banco em Pagar com chave e digita o valor do pedido.'],
   ['Qual a diferença entre Painel Privado e Painel Privado PRO?','O PRO tem tudo o que o painel padrão oferece, com mais funções e funcionalidades aprimoradas para dar mais controle e mais possibilidades de otimização.'],
   ['A otimização manual serve para qualquer PC?','Os ajustes são feitos de acordo com o seu hardware. Se tiver dúvida sobre o seu equipamento, fale com o suporte antes de comprar.'],
   ['Vale a pena pegar um combo?','Os combos trazem mais de 260 otimizações do Windows (a Otimização Manual avulsa tem mais de 200), o painel e um combo otimizado de FiveM, por menos do que painel e otimização separados.']
@@ -1039,7 +1041,7 @@ function renderCheckout(){
   host.innerHTML =
     '<div class="crumbs"><button data-action="home">Início</button><span>›</span><span>Checkout</span></div>' +
     '<div class="co"><div>' +
-      '<div class="box"><h2>Formas de pagamento</h2><div class="in"><div class="pay"><div class="logo">' + ico('pix') + '</div><div><b>Pix</b><span class="fast">' + ico('bolt') + 'Mais rápido</span><small>Copie o código e pague no app do banco</small></div></div></div></div>' +
+      '<div class="box"><h2>Formas de pagamento</h2><div class="in"><div class="pay"><div class="logo">' + ico('pix') + '</div><div><b>Pix</b><span class="fast">' + ico('bolt') + 'Mais rápido</span><small>Copie a chave e pague no app do banco</small></div></div></div></div>' +
       '<form class="box" id="coForm" novalidate><h2>Informações de contato</h2><div class="in">' +
         userBlock() +
         '<div class="field"><label for="fName">Nome</label><input id="fName" type="text" autocomplete="name" placeholder="Seu nome"></div>' +
@@ -1114,13 +1116,13 @@ function renderPix(host){
       '<div class="hd"><div class="ok">' + ico('check') + '</div><div><h2>Pedido criado. Receba via ticket</h2><p>Pague o Pix e mande o comprovante no ticket do Discord.</p></div></div>' +
       '<div class="orderid"><div><span>ID do pedido</span><b id="oid"></b></div><button class="btn ghost sm" data-action="copy-oid">' + ico('copy') + 'Copiar ID</button></div>' +
       '<div style="padding:18px 22px 0"><div class="totrow big" style="justify-content:space-between"><span>Total a pagar</span><span>' + money(o.total) + '</span></div>' +
-      '<span class="timer" id="pixTimer" style="display:block;margin-top:4px"></span></div>' +
+      '</div>' +
       '<ol class="tsteps">' +
-        '<li><span>Toque em <b>Copiar código Pix</b>, abra o app do banco em <b>Pix Copia e Cola</b>, cole e pague <b>' + money(o.total) + '</b>.</span></li>' +
-        '<li><span>Entre no nosso Discord e <b>abra um ticket</b>.</span></li>' +
-        '<li><span>Mande o <b>print do comprovante</b> e o <b>ID do pedido</b>. A equipe confere e entrega no ticket.</span></li>' +
+        '<li><span>Toque em <b>Copiar chave Pix</b>. No app do banco, abra <b>Pix → Pagar com chave</b>, cole a chave e confira o nome do recebedor.</span></li>' +
+        '<li><span>Digite o valor exato de <b>' + money(o.total) + '</b> e pague.</span></li>' +
+        '<li><span>Entre no nosso Discord, <b>abra um ticket</b> e mande o <b>print do comprovante</b> com o <b>ID do pedido</b>. A equipe confere e entrega no ticket.</span></li>' +
       '</ol>' +
-      '<div style="padding:0 22px"><button class="btn block paybtn" data-action="copy-pix" id="copyPixBtn">' + ico('copy') + 'Copiar código Pix</button></div>' +
+      '<div class="paykeys"><button class="btn paybtn" data-action="copy-pix" id="copyPixBtn">' + ico('copy') + 'Copiar chave Pix</button><button class="btn ghost paybtn" data-action="copy-amount">' + ico('copy') + 'Copiar valor ' + money(o.total) + '</button></div>' +
       '<div class="recap" style="margin-top:18px">' + itemsRecap(o) + '</div>' +
       '<div class="dmnote">' + DC_SVG + '<span id="dmNote"></span></div>' +
       '<div class="acts">' +
@@ -1140,17 +1142,17 @@ function renderPix(host){
   tick(); pixTimer = setInterval(tick, 1000);
 }
 /* Copia sem mostrar o código na tela. */
-function copySecret(text, okMsg, btn){
+function copySecret(text, okMsg, btn, doneLabel){
   var ok = function(){
     toast('<span>' + okMsg + '</span>');
-    if (btn){ var old = btn.innerHTML; btn.innerHTML = ico('check') + 'Código copiado'; setTimeout(function(){ btn.innerHTML = old; }, 2200); }
+    if (btn){ var old = btn.innerHTML; btn.innerHTML = ico('check') + (doneLabel || 'Copiado'); setTimeout(function(){ btn.innerHTML = old; }, 2200); }
   };
   var legacy = function(){
     var t = document.createElement('textarea'); t.value = text; t.setAttribute('readonly', '');
     t.style.position = 'fixed'; t.style.opacity = '0'; t.style.left = '-9999px'; document.body.appendChild(t); t.select();
     var done = false; try { done = document.execCommand('copy'); } catch(e){}
     t.remove();
-    if (done) ok(); else toast('<span>Não foi possível copiar neste navegador. Tente de novo ou peça o código no ticket do Discord.</span>');
+    if (done) ok(); else toast('<span>Não foi possível copiar neste navegador. Tente de novo ou peça a chave no ticket do Discord.</span>');
   };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy); else legacy();
 }
@@ -1253,7 +1255,8 @@ document.addEventListener('click', function(e){
     case 'coupon-add': applyCoupon(); break;
     case 'coupon-rm': state.coupon = null; if ($('#cInput')) $('#cInput').value = ''; renderSummary(); break;
     case 'copy-coupon': var code = Object.keys(CONFIG.coupons)[0]; state.coupon = code; copyText(code, 'Cupom <b>' + code + '</b> copiado e aplicado no carrinho'); if (state.view === 'checkout') renderSummary(); break;
-    case 'copy-pix': copySecret(paying.charge.copyPaste, 'Código Pix copiado. Cole no app do banco em Pix Copia e Cola.', el); break;
+    case 'copy-pix': copySecret(atob(CONFIG.pix.keyB64), 'Chave Pix copiada. Cole no app do banco em Pagar com chave.', el, 'Chave copiada'); break;
+    case 'copy-amount': copySecret(paying.order.total.toFixed(2).replace('.', ','), 'Valor copiado.', el, 'Valor copiado'); break;
     case 'copy-oid': copyText(paying.order.id, 'ID do pedido copiado'); break;
     case 'dc-login': discordLogin(); break;
     case 'dc-logout': discordLogout(); break;
