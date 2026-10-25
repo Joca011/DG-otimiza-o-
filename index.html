@@ -1025,30 +1025,48 @@ function submitOrder(e){
     paying = { order: order, charge: charge, expires: Date.now() + CONFIG.pixMinutes * 60000, paid: false };
     state.cart = []; state.coupon = null; saveCart(); $('#cartCount').textContent = 0; renderDrawer();
     renderCheckout(); window.scrollTo(0, 0);
+    notifyBot(order).then(function(sent){ if (!paying) return; paying.dmSent = sent; var n = $('#dmNote'); if (n) n.textContent = dmText(); });
   });
 }
 function itemsRecap(o){
   return o.items.map(function(i){ var p = byId(i.id); return '<div class="rr"><span>' + esc(p.name) + (i.qty > 1 ? ' × ' + i.qty : '') + '</span><span>' + money(p.price * i.qty) + '</span></div>'; }).join('') +
     (o.coupon ? '<div class="rr"><span>Cupom ' + esc(o.coupon) + '</span><span>aplicado</span></div>' : '') +
-    '<div class="rr" style="font-family:var(--f-display);font-weight:600;font-size:16px"><span>Total pago</span><span>' + money(o.total) + '</span></div>';
+    '<div class="rr" style="font-family:var(--f-display);font-weight:600;font-size:16px"><span>Total</span><span>' + money(o.total) + '</span></div>';
+}
+function dmText(){
+  if (paying.dmSent) return 'Enviamos o resumo deste pedido no seu privado do Discord.';
+  if (paying.dmSent === false && CONFIG.discord.backend && state.user && !state.user.demo) return 'Não conseguimos mandar a mensagem no seu privado. Sem problema: abra o ticket com o ID acima.';
+  if (!CONFIG.discord.backend || (state.user && state.user.demo)) return 'No site com o bot ativo, o resumo do pedido chega no privado do Discord do comprador.';
+  return 'Enviando o resumo para o seu privado do Discord...';
 }
 function renderPix(host){
-  if (paying.paid){ renderDone(host); return; }
-  var o = paying.order;
-  host.innerHTML = '<div class="crumbs"><button data-action="home">Início</button><span>›</span><span>Pagamento</span></div>' +
-    '<div class="box" style="max-width:640px;margin-bottom:40px"><h2>Pague com Pix<span class="timer" id="pixTimer"></span></h2><div class="in">' +
-      '<div class="ok-head">' + ico('check') + 'Pedido ' + o.id + '</div>' +
-      '<div class="totrow big" style="justify-content:flex-start;gap:12px"><span>Total</span><span>' + money(o.total) + '</span></div>' +
-      '<ol class="pixsteps"><li>Toque em <b>Copiar código Pix</b>.</li><li>No app do banco, abra <b>Pix</b> e escolha <b>Pix Copia e Cola</b>.</li><li>Cole o código, confira o valor de <b>' + money(o.total) + '</b> e pague.</li></ol>' +
-      '<button class="btn block paybtn" data-action="copy-pix" id="copyPixBtn">' + ico('copy') + 'Copiar código Pix</button>' +
-      '<div class="paid-cta"><button class="btn ghost block" data-action="paid" id="paidBtn">' + ico('check') + 'Já paguei</button><small>Toque depois de concluir o Pix. Guarde o comprovante: você vai precisar dele no ticket.</small></div>' +
-    '</div></div>';
+  var o = paying.order, inv = CONFIG.discord.invite;
+  host.innerHTML = '<div class="crumbs"><button data-action="home">Início</button><span>›</span><span>Pedido ' + o.id + '</span></div>' +
+    '<div class="box done">' +
+      '<div class="hd"><div class="ok">' + ico('check') + '</div><div><h2>Pedido criado. Receba via ticket</h2><p>Pague o Pix e mande o comprovante no ticket do Discord.</p></div></div>' +
+      '<div class="orderid"><div><span>ID do pedido</span><b id="oid"></b></div><button class="btn ghost sm" data-action="copy-oid">' + ico('copy') + 'Copiar ID</button></div>' +
+      '<div style="padding:18px 22px 0"><div class="totrow big" style="justify-content:space-between"><span>Total a pagar</span><span>' + money(o.total) + '</span></div>' +
+      '<span class="timer" id="pixTimer" style="display:block;margin-top:4px"></span></div>' +
+      '<ol class="tsteps">' +
+        '<li><span>Toque em <b>Copiar código Pix</b>, abra o app do banco em <b>Pix Copia e Cola</b>, cole e pague <b>' + money(o.total) + '</b>.</span></li>' +
+        '<li><span>Entre no nosso Discord e <b>abra um ticket</b>.</span></li>' +
+        '<li><span>Mande o <b>print do comprovante</b> e o <b>ID do pedido</b>. A equipe confere e entrega no ticket.</span></li>' +
+      '</ol>' +
+      '<div style="padding:0 22px"><button class="btn block paybtn" data-action="copy-pix" id="copyPixBtn">' + ico('copy') + 'Copiar código Pix</button></div>' +
+      '<div class="recap" style="margin-top:18px">' + itemsRecap(o) + '</div>' +
+      '<div class="dmnote">' + DC_SVG + '<span id="dmNote"></span></div>' +
+      '<div class="acts">' +
+        (inv ? '<a class="btn dc" href="' + esc(inv) + '" target="_blank" rel="noopener">' + DC_SVG + 'Abrir ticket no Discord</a>' : '') +
+        '<button class="btn ghost" data-action="home">Voltar à loja</button></div>' +
+    '</div>';
+  $('#oid').textContent = o.id;
+  $('#dmNote').textContent = dmText();
   hydrate(host);
   clearInterval(pixTimer);
   var tick = function(){
     var el = $('#pixTimer'); if (!el){ clearInterval(pixTimer); return; }
     var s = Math.max(0, Math.round((paying.expires - Date.now()) / 1000));
-    el.textContent = s ? 'Expira em ' + String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : 'Tempo esgotado: gere um novo pedido';
+    el.textContent = s ? 'Código Pix válido por ' + String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : 'Tempo esgotado: faça um novo pedido';
     if (!s) clearInterval(pixTimer);
   };
   tick(); pixTimer = setInterval(tick, 1000);
@@ -1167,7 +1185,6 @@ document.addEventListener('click', function(e){
     case 'copy-coupon': var code = Object.keys(CONFIG.coupons)[0]; state.coupon = code; copyText(code, 'Cupom <b>' + code + '</b> copiado e aplicado no carrinho'); if (state.view === 'checkout') renderSummary(); break;
     case 'copy-pix': copySecret(paying.charge.copyPaste, 'Código Pix copiado. Cole no app do banco em Pix Copia e Cola.', el); break;
     case 'copy-oid': copyText(paying.order.id, 'ID do pedido copiado'); break;
-    case 'paid': confirmPaid(); break;
     case 'dc-login': discordLogin(); break;
     case 'dc-logout': discordLogout(); break;
   }
